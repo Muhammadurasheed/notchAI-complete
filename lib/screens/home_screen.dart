@@ -81,15 +81,15 @@ class HomeScreen extends StatelessWidget {
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Welcome to NotchAI 👋🤗🎉💗",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                     Text(
+                      "Welcome to NotchAI 👋🤗👨‍⚕️🩺",
+                      style: TextStyle(
+                      color: Colors.white, // Text color
+                      fontSize: 20, // Font size
+                      fontWeight: FontWeight.bold, // Text weight         
                       ),
-                      
+                    )
+                                        
                     ],
                   ),
                 ],

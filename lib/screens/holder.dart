@@ -8,7 +8,7 @@ import 'package:notchai_frontend/screens/community_home_screen.dart';
 import 'package:notchai_frontend/services/assets_manager.dart';
 import 'package:notchai_frontend/services/services.dart';
 import 'package:scanning_effect/scanning_effect.dart';
-import 'package:animated_text_kit/animated_text_kit.dart'; 
+import 'package:animated_text_kit/animated_text_kit.dart'; // Import the package
 
 class ScanTech extends StatefulWidget {
   const ScanTech({Key? key}) : super(key: key);
@@ -24,7 +24,7 @@ class _ScanTechState extends State<ScanTech> {
   static final autodermApikey = dotenv.env["Autoderm_API_KEY"];
   bool isAnalyzing = false;
   bool isGeneratingCausesAndRecommendations = false;
-  bool showResultText = false; 
+  bool showResultText = false; // Control text animation
 
   Future<void> _selectImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -103,9 +103,7 @@ class _ScanTechState extends State<ScanTech> {
                   ))
               .reduce((a, b) => a.confidence > b.confidence ? a : b);
 
-          setState(() {
-            highestAccuracyPrediction = highestConfidencePrediction;
-          });
+          highestAccuracyPrediction = highestConfidencePrediction;
         } else {
           // Handle error
         }
@@ -128,7 +126,6 @@ class _ScanTechState extends State<ScanTech> {
           AssetsManager.notchaiLogo,
           fit: BoxFit.contain,
         ),
-        
         backgroundColor: const Color(0xFF00C6AD),
         title: const Text("Scan Skin"),
         actions: [
@@ -138,10 +135,8 @@ class _ScanTechState extends State<ScanTech> {
             },
             icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
           ),
-          ],
-
+        ],
       ),
-      
       body: Stack(
         children: <Widget>[
           Container(
@@ -150,10 +145,10 @@ class _ScanTechState extends State<ScanTech> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [Color(0xFFB2FFFF), Color(0xFFB2FFFF)],
-              ),       
-              ),     
-          ),     
-        Center(
+              ),
+            ),
+          ),
+          Center(
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -357,11 +352,21 @@ class _ScanTechState extends State<ScanTech> {
                                                 border: Border.all(color: const Color(0xFF00C6AD)),
                                                 borderRadius: BorderRadius.circular(10),
                                               ),
-                                              child: Text(
-                                                item,
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 16,
+                                              child: ListTile(
+                                                title: const Text(
+                                                  'Cause or Recommendation:',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF00C6AD),
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                subtitle: Text(
+                                                  item,
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -416,7 +421,20 @@ class Prediction {
 
   Prediction({
     required this.name,
-    required this .confidence,
+    required this.confidence,
     this.showCausesAndRecommendations = false,
   });
+}
+
+class ImagePlaceholder extends StatelessWidget {
+  const ImagePlaceholder({Key? key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(
+      Icons.camera_alt,
+      color: Colors.white,
+      size: 64,
+    );
+  }
 }

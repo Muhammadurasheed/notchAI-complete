@@ -128,7 +128,7 @@ class _FullNewsPageState extends State<FullNewsPage> {
   Future<void> summarizeArticle(BuildContext context) async {
     final openAIKey = dotenv.env['OPENAI_API_KEY'];
     final articleText = article['content'] ?? '';
-    const apiUrl = 'https://api.openai.com/v1/engines/davinci/completions'; // Use the "davinci" engine
+    const apiUrl = 'https://api.openai.com/v1/engines/text-davinci-003/completions'; 
 
     final headers = {
       'Content-Type': 'application/json',
@@ -136,8 +136,8 @@ class _FullNewsPageState extends State<FullNewsPage> {
     };
 
     final data = {
-      'prompt': 'Summarize the following news article:\n$articleText',
-      'max_tokens': 60, // Limit the summary to 50 tokens
+      'prompt': 'Please summarize the following news article in a clear and concise manner:\n$articleText',
+      'max_tokens': 150, // Increase the max_tokens for longer summaries
     };
 
     try {
@@ -156,9 +156,10 @@ class _FullNewsPageState extends State<FullNewsPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Summary'),
+              title: const Text('The News Summary'),
+              contentPadding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
               content: SingleChildScrollView(
-                child: Text(summaryText),
+              child: Text(summaryText),
               ),
               actions: <Widget>[
                 TextButton(
@@ -234,7 +235,7 @@ class _FullNewsPageState extends State<FullNewsPage> {
                   summarizeArticle(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00C6AD), // Set the background color
+                  backgroundColor: const Color(0xFF00C6AD),
                 ),
                 child: const Text('Summarize Article'),
               ),
