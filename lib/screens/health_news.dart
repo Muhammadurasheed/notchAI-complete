@@ -125,10 +125,16 @@ class _FullNewsPageState extends State<FullNewsPage> {
 
   _FullNewsPageState({required this.article});
 
+  bool isSummarizing = false;
+
   Future<void> summarizeArticle(BuildContext context) async {
+    setState(() {
+      isSummarizing = true;
+    });
+
     final openAIKey = dotenv.env['OPENAI_API_KEY'];
     final articleText = article['content'] ?? '';
-    const apiUrl = 'https://api.openai.com/v1/engines/text-davinci-003/completions'; 
+    const apiUrl = 'https://api.openai.com/v1/engines/text-davinci-003/completions';
 
     final headers = {
       'Content-Type': 'application/json',
@@ -150,6 +156,7 @@ class _FullNewsPageState extends State<FullNewsPage> {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final summaryText = jsonData['choices'][0]['text'];
+
         // Show the summary in a dialog
         // ignore: use_build_context_synchronously
         showDialog(
@@ -159,7 +166,7 @@ class _FullNewsPageState extends State<FullNewsPage> {
               title: const Text('The News Summary'),
               contentPadding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
               content: SingleChildScrollView(
-              child: Text(summaryText),
+                child: Text(summaryText),
               ),
               actions: <Widget>[
                 TextButton(
@@ -183,7 +190,10 @@ class _FullNewsPageState extends State<FullNewsPage> {
       if (kDebugMode) {
         print('API Request Error: $error');
       }
-      // Handle the error as needed, e.g., show a snackbar or log it
+    } finally {
+      setState(() {
+        isSummarizing = false;
+      });
     }
   }
 
@@ -216,33 +226,85 @@ class _FullNewsPageState extends State<FullNewsPage> {
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              SingleChildScrollView(
-                child: Text(
-                  article['description'] ?? 'No description available',
-                  style: const TextStyle(fontSize: 16),
-                ),
+              Text(
+                article['description'] ?? 'No description available',
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
-              SingleChildScrollView(
-                child: Text(
-                  article['content'] ?? 'No content available',
-                  style: const TextStyle(fontSize: 16),
-                ),
+              ExpandText(
+                text: article['content'] ?? 'No content available',
+                style: const TextStyle(fontSize: 16),
+                isExpanded: isSummarizing,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
-                  summarizeArticle(context);
-                },
+                onPressed: isSummarizing
+                    ? null
+                    : () {
+                        summarizeArticle(context);
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00C6AD),
                 ),
-                child: const Text('Summarize Article'),
+                child: isSummarizing
+                    ? const CircularProgressIndicator()
+                    : const Text('Summarize Article'),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class ExpandText extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  final bool isExpanded;
+
+  const ExpandText({
+    Key? key,
+    required this.text,
+    required this.style,
+    required this.isExpanded,
+  }) : super(key: key);
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _ExpandTextState createState() => _ExpandTextState();
+}
+
+class _ExpandTextState extends State<ExpandText> {
+  bool isExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isExpanded = widget.isExpanded;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          widget.text,
+          style: widget.style,
+          maxLines: isExpanded ? null : 5, // Display all lines when expanded
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (!isExpanded)
+          TextButton(
+            onPressed: () {
+              setState(() {
+                isExpanded = true;
+              });
+            },
+            child: const Text('Read more'),
+          ),
+      ],
     );
   }
 }
